@@ -377,7 +377,7 @@ dialog::backdrop{background:rgba(10,12,18,.7)}
       </fieldset>
       <p class="fine">You will receive the daily quote and kindness challenge by email, plus occasional news about our campaigns and apps.</p>
       <input type="hidden" name="locale" value="en"><input type="hidden" name="html_type" value="simple">
-      <div class="hp" aria-hidden="true"><label for="j-hp">Leave this empty</label><input type="text" id="j-hp" name="email_address_check" tabindex="-1" autocomplete="off"></div>
+      <div class="hp" aria-hidden="true"><label for="j-hp">Do not fill</label><input type="text" id="j-hp" name="hp_field" tabindex="-1" autocomplete="off" data-lpignore="true"></div>
       <button class="btn btn-primary" type="submit">Join free</button>
       <p class="form-msg" id="form-msg" role="status"></p>
       <p class="fine">You can unsubscribe from any email with one click. See our <a href="#privacy" id="privacy-link">privacy notice</a>.</p>
@@ -874,12 +874,14 @@ $('join-form').addEventListener('submit', async e=>{
   const form = e.target; const msg = $('form-msg'); const btn = form.querySelector('button[type=submit]');
   try{
     const email = $('j-email').value.trim();
-    if($('j-hp').value){ return; }
+    const hp = $('j-hp').value.trim();
+    const autofilled = (()=>{ try{ return $('j-hp').matches(':autofill'); }catch(_){ return false; } })();
+    if(hp && hp !== email && !autofilled){ msg.className='form-msg ok'; msg.textContent='Thank you.'; return; }
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.className='form-msg warn'; msg.textContent='Please enter a valid email address.'; $('j-email').focus(); return; }
     if(!CONFIG.signupUrl){ msg.className='form-msg warn'; msg.textContent=`Online sign-up opens very soon. Until then, email ${CONFIG.contactEmail} with the word JOIN and we will add you.`; return; }
     btn.disabled=true; const label=btn.textContent; btn.textContent='Joining...';
     msg.className='form-msg'; msg.textContent='';
-    const data = new URLSearchParams(new FormData(form)); data.set('EMAIL', email);
+    const data = new URLSearchParams(new FormData(form)); data.set('EMAIL', email); data.delete('hp_field'); data.set('email_address_check','');
     try{
       await fetch(CONFIG.signupUrl, {method:'POST', mode:'no-cors', body:data});
       msg.className='form-msg ok'; msg.textContent='Thank you. Please check your inbox (and spam folder) and click the link in our email to confirm your place.';
