@@ -312,6 +312,7 @@ dialog::backdrop{background:rgba(10,12,18,.7)}
           <button class="qbtn" id="btn-card" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>Make a picture</button>
           <a class="qbtn" id="btn-wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
           <a class="qbtn" id="btn-fb" href="#" target="_blank" rel="noopener">Facebook</a>
+          <a class="qbtn" id="btn-li" href="#" target="_blank" rel="noopener">LinkedIn</a>
           <a class="qbtn" id="btn-x" href="#" target="_blank" rel="noopener">X</a>
         </div>
         <div class="next">
@@ -702,6 +703,7 @@ function renderQuote(d){
   $('btn-wa').href = 'https://wa.me/?text=' + enc;
   $('btn-x').href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(quoteText(q)) + '&url=' + encodeURIComponent(CONFIG.siteUrl);
   $('btn-fb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(CONFIG.siteUrl);
+  $('btn-li').href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(CONFIG.siteUrl);
   const favs = load('ovomf.favs', []);
   const saved = favs.includes(q.id);
   $('btn-save').setAttribute('aria-pressed', saved);
@@ -746,6 +748,7 @@ async function copyText(text){
 }
 
 $('btn-copy').addEventListener('click', async ()=>{ const ok = await copyText(shareText(quoteFor(shown))); toast(ok ? 'Quote copied' : 'Select the quote text to copy it'); });
+if(!(navigator.share && matchMedia('(pointer:coarse)').matches)){ $('btn-share').hidden = true; }
 $('btn-share').addEventListener('click', async ()=>{
   const q = quoteFor(shown);
   if(navigator.share){ try{ await navigator.share({title:'Today\'s quote', text: quoteText(q), url: CONFIG.siteUrl}); return; }catch(e){ if(e && e.name==='AbortError') return; } }
