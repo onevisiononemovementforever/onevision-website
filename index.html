@@ -748,6 +748,10 @@ async function copyText(text){
   }
 }
 
+// Facebook and LinkedIn don't accept pre-filled text: copy the quote so people can paste it
+['btn-fb','btn-li'].forEach(id=>$(id).addEventListener('click', ()=>{
+  copyText(shareText(quoteFor(shown))).then(ok=>{ if(ok) toast('Quote copied. Paste it into your post (Cmd+V / long-press → Paste)'); });
+}));
 $('btn-copy').addEventListener('click', async ()=>{ const ok = await copyText(shareText(quoteFor(shown))); toast(ok ? 'Quote copied' : 'Select the quote text to copy it'); });
 if(!(navigator.share && matchMedia('(pointer:coarse)').matches)){ $('btn-share').hidden = true; }
 $('btn-share').addEventListener('click', async ()=>{
